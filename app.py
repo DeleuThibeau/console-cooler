@@ -11,6 +11,7 @@ import threading
 from helpers.klasseknop import Button
 from RPi import GPIO
 
+
 led1 = 20
 knop1 = Button(21)
 
