@@ -7,17 +7,36 @@ from flask_cors import CORS
 import time
 import threading
 
-# Code voor led
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+# Code voor componenten
 from helpers.klasseknop import Button
+from helpers.Mcp import Mcp
 from RPi import GPIO
+import spidev
 
 
 led1 = 20
 knop1 = Button(21)
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(led1, GPIO.OUT)
+
+def setup():
+    GPIO.setwarnings(False)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(led1, GPIO.OUT)
+
+
+def spi_lichtsensor(waarde):
+    Mcp.read_channel(waarde)
+    return Mcp.read_channel(waarde)
+
+
+def omzetting_lichtsensor(byte):
+    global percentage_lichtsensor
+    percentage_lichtsensor = (byte/1023) * 100
+    percentage_lichtsensor = 100-percentage_lichtsensor
+    print(
+        f"De lichtsensor heeft een percentage van: {percentage_lichtsensor:.2f}%")
 
 
 app = Flask(__name__)
@@ -70,8 +89,24 @@ def lees_knop(pin):
     data = DataRepository.read_status_lamp_by_id("2")
     socketio.emit('B2F_verandering_lamp', {'lamp': data})
 
+try:
+    setup()
+    Mcp = Mcp()
+    while True:
+        lichtsensor = spi_lichtsensor(0)
+        Mcp.closepi
+        omzetting_lichtsensor(lichtsensor)
+        time.sleep(1)
 
-knop1.on_press(lees_knop)
+    knop1.on_press(lees_knop)
+
+except Exception as ex:
+    print(ex)
+
+finally:
+    print('\n Script is ten einde, cleanup is klaar')
+    GPIO.cleanup()
+
 
 
 if __name__ == '__main__':
