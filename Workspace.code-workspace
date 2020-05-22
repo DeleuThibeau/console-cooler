@@ -7,5 +7,7 @@
 			"path": "../../../var/www/html"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "html"
+	}
 }

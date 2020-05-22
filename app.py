@@ -5,6 +5,7 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 import time
+from datetime import datetime
 import threading
 
 # -----------------------------------------------------------------------------------------------------------------------------------
@@ -35,8 +36,10 @@ def omzetting_lichtsensor(byte):
     global percentage_lichtsensor
     percentage_lichtsensor = (byte/1023) * 100
     percentage_lichtsensor = 100-percentage_lichtsensor
-    print(
-        f"De lichtsensor heeft een percentage van: {percentage_lichtsensor:.2f}%")
+    # print(
+    #     f"De lichtsensor heeft een percentage van: {percentage_lichtsensor:.2f}%")
+    return percentage_lichtsensor
+    
 
 
 app = Flask(__name__)
@@ -93,10 +96,14 @@ try:
     setup()
     Mcp = Mcp()
     while True:
+        date = datetime.now()
         lichtsensor = spi_lichtsensor(0)
         Mcp.closepi
-        omzetting_lichtsensor(lichtsensor)
+        Ldr = omzetting_lichtsensor(lichtsensor)
+        DataRepository.update_meting(1,1,date,Ldr,0,'Geen commentaar',1)
+
         time.sleep(1)
+
 
     knop1.on_press(lees_knop)
 
@@ -107,6 +114,23 @@ finally:
     print('\n Script is ten einde, cleanup is klaar')
     GPIO.cleanup()
 
+
+
+# knop1.on_press(lees_knop)
+
+# DataRepository.create_sensor('One wire','Een warmte sensor',4,'temperatuur','graden celcius')
+
+# DataRepository.create_sensor('PIR Motion sensor','Een bewegingsensor',9,'motione','m/s')
+
+# DataRepository.create_sensor('Ultra sonic sensor','een afstand sensor die wordt gebruikt om de luchtsnelheid te berekenen',5,'afstand','meter')
+
+# DataRepository.create_actuator('Ventilator','Guncaizhu','Een koelingsapparaat dat werkt op 5V',14.99,'Rotatie','Lucht')
+
+# DataRepository.update_sensor('PIR Motion sensor','Een bewegingsensor',9,'motion','m/s',3)
+
+# date = datetime.now()
+
+# DataRepository.create_meting(4,1,date,0,0,'Geen commentaar')
 
 
 if __name__ == '__main__':
