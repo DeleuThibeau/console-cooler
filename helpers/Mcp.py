@@ -29,3 +29,7 @@ class Mcp:
 
     def closepi(self):
         self.spi.close()
+
+    def test(self):
+        x=print('Hallo')
+        return x

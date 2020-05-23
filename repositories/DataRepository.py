@@ -34,6 +34,16 @@ class DataRepository:
         return Database.execute_sql(sql, params)
 
 #---------------------------------------------------------------------------
+    @staticmethod
+    def read_sensoren():
+        sql="SELECT * FROM Sensor"
+        return Database.get_rows(sql)
+
+    @staticmethod
+    def read_sensor(SensorID):
+        sql="SELECT * FROM Sensor WHERE SensorID = %s"
+        parameters=[SensorID]
+        return Database.get_one_row(sql, parameters)        
 
     @staticmethod
     def create_sensor(Naam,Beschrijving,Aankoopprijs,Type,Eenheid):
@@ -46,6 +56,15 @@ class DataRepository:
         sql=("UPDATE Sensor set Naam = %s, Beschrijving = %s, Aankoopprijs = %s, Type = %s, Eenheid = %s  WHERE SensorID = %s")
         parameters= [Naam,Beschrijving,Aankoopprijs,Type,Eenheid,SensorID]
         return Database.execute_sql(sql, parameters)
+
+
+
+
+
+    @staticmethod
+    def read_Actuator():
+        sql="SELECT * FROM Actuator"
+        return Database.get_rows(sql)
     
     @staticmethod
     def create_actuator(Naam,Merk,Beschrijving,Aankoopprijs,Type,Eenheid):
@@ -58,6 +77,24 @@ class DataRepository:
         sql=("UPDATE Actuator set Naam = %s, Beschrijving = %s, Aankoopprijs = %s, Type = %s, Eenheid = %s  WHERE SensorID = %s")
         parameters= [Naam,Beschrijving,Aankoopprijs,Type,Eenheid,ActuatorID]
         return Database.execute_sql(sql, parameters)
+
+
+
+
+
+
+
+    @staticmethod
+    def read_metingen():
+        sql="SELECT * FROM Sensor"
+        return Database.get_rows(sql)
+
+
+    @staticmethod
+    def read_meting(MeetwaardeID):
+        sql="SELECT * FROM Metingen WHERE MeetwaardeID = %s"
+        parameters=[MeetwaardeID]
+        return Database.get_one_row(sql, parameters)   
 
     @staticmethod
     def create_meting(SensorID, ActuatorID, Datum,Waarde,Toestand,Commentaar):

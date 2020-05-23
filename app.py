@@ -13,6 +13,7 @@ import threading
 # Code voor componenten
 from helpers.klasseknop import Button
 from helpers.Mcp import Mcp
+from helpers.OneWire import OneWire
 from RPi import GPIO
 import spidev
 
@@ -25,6 +26,8 @@ def setup():
     GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(led1, GPIO.OUT)
+    sensorid = ["28-011610c65dee"]
+    temp = {}
 
 
 def spi_lichtsensor(waarde):
@@ -39,6 +42,8 @@ def omzetting_lichtsensor(byte):
     # print(
     #     f"De lichtsensor heeft een percentage van: {percentage_lichtsensor:.2f}%")
     return percentage_lichtsensor
+
+
     
 
 
@@ -92,17 +97,36 @@ def lees_knop(pin):
     data = DataRepository.read_status_lamp_by_id("2")
     socketio.emit('B2F_verandering_lamp', {'lamp': data})
 
+
 try:
     setup()
     Mcp = Mcp()
+    OneWire = OneWire()
+
     while True:
+        #---Huidige tijd ophalen voor te schrijven naar databank---
         date = datetime.now()
+
+        #-----------------LDR------------------------------
         lichtsensor = spi_lichtsensor(0)
         Mcp.closepi
-        Ldr = omzetting_lichtsensor(lichtsensor)
-        DataRepository.update_meting(1,1,date,Ldr,0,'Geen commentaar',1)
 
-        time.sleep(1)
+        ldr = omzetting_lichtsensor(lichtsensor)
+        
+        DataRepository.update_meting(1,1,date,ldr,0,'Geen commentaar',1)
+        data_ldr = DataRepository.read_meting("1")
+        print(f"json van LDR = \n {data_ldr}")
+
+        socketio.emit('B2F_LDR_weergeven', {'ldr': data_ldr})
+
+        #---------------One Wire----------------------------
+        temp = OneWire.read_one_wire()
+        DataRepository.update_meting(2,1,date,temp,0,'Geen commentaar',3)
+        data_temp = DataRepository.read_meting("3")
+        print(f"json van temp = \n {data_temp}")
+        
+
+        time.sleep(5)
 
 
     knop1.on_press(lees_knop)
