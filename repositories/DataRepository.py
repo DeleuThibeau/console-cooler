@@ -35,58 +35,34 @@ class DataRepository:
 
 #---------------------------------------------------------------------------
     @staticmethod
-    def read_sensoren():
-        sql="SELECT * FROM Sensor"
+    def read_Devices():
+        sql="SELECT * FROM Device"
         return Database.get_rows(sql)
 
     @staticmethod
-    def read_sensor(SensorID):
-        sql="SELECT * FROM Sensor WHERE SensorID = %s"
-        parameters=[SensorID]
+    def read_Device(DeviceID):
+        sql="SELECT * FROM Device WHERE DeviceID = %s"
+        parameters=[DeviceID]
         return Database.get_one_row(sql, parameters)        
 
     @staticmethod
-    def create_sensor(Naam,Beschrijving,Aankoopprijs,Type,Eenheid):
-        sql='INSERT INTO Sensor (Naam,Beschrijving,Aankoopprijs,Type,Eenheid) VALUES (%s,%s,%s,%s,%s)'
-        parameters = [Naam,Beschrijving,Aankoopprijs,Type,Eenheid]
+    def create_Device(TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving):
+        sql='INSERT INTO Device (TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving) VALUES (%s,%s,%s,%s,%s)'
+        parameters = [TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving]
         return Database.execute_sql(sql, parameters)
 
     @staticmethod
-    def update_sensor(Naam,Beschrijving,Aankoopprijs,Type,Eenheid,SensorID):
-        sql=("UPDATE Sensor set Naam = %s, Beschrijving = %s, Aankoopprijs = %s, Type = %s, Eenheid = %s  WHERE SensorID = %s")
-        parameters= [Naam,Beschrijving,Aankoopprijs,Type,Eenheid,SensorID]
+    def update_Device(TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving, DeviceID):
+        sql=("UPDATE Device set TypeDevice = %s, Naam = %s, Eenheid = %s, Merk =%s, Aankoopprijs = %s, Beschrijving = %s WHERE DeviceID = %s")
+        parameters= [TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving,DeviceID]
         return Database.execute_sql(sql, parameters)
-
-
-
-
-
-    @staticmethod
-    def read_Actuator():
-        sql="SELECT * FROM Actuator"
-        return Database.get_rows(sql)
-    
-    @staticmethod
-    def create_actuator(Naam,Merk,Beschrijving,Aankoopprijs,Type,Eenheid):
-        sql='INSERT INTO Actuator (Naam,Beschrijving,Aankoopprijs,Type,Eenheid) VALUES (%s,%s,%s,%s,%s)'
-        parameters = [Naam,Beschrijving,Aankoopprijs,Type,Eenheid]
-        return Database.execute_sql(sql, parameters)
-
-    @staticmethod
-    def update_actuator(Naam,Beschrijving,Aankoopprijs,Type,Eenheid,ActuatorID):
-        sql=("UPDATE Actuator set Naam = %s, Beschrijving = %s, Aankoopprijs = %s, Type = %s, Eenheid = %s  WHERE SensorID = %s")
-        parameters= [Naam,Beschrijving,Aankoopprijs,Type,Eenheid,ActuatorID]
-        return Database.execute_sql(sql, parameters)
-
-
-
 
 
 
 
     @staticmethod
     def read_metingen():
-        sql="SELECT * FROM Sensor"
+        sql="SELECT * FROM Metingen"
         return Database.get_rows(sql)
 
 
@@ -97,15 +73,15 @@ class DataRepository:
         return Database.get_one_row(sql, parameters)   
 
     @staticmethod
-    def create_meting(SensorID, ActuatorID, Datum,Waarde,Toestand,Commentaar):
-        sql='INSERT INTO Metingen (SensorID, ActuatorID,Datum,Waarde,Toestand,Commentaar) VALUES (%s,%s,%s,%s,%s,%s)'
-        parameters = [SensorID, ActuatorID,Datum,Waarde,Toestand,Commentaar]
+    def create_meting(DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar):
+        sql='INSERT INTO Metingen (DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar) VALUES (%s,%s,%s,%s,%s,%s)'
+        parameters = [DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar]
         return Database.execute_sql(sql, parameters)
 
     @staticmethod
-    def update_meting(SensorID, ActuatorID, Datum,Waarde,Toestand,Commentaar, MeetwaardeID):
-        sql=("UPDATE Metingen set SensorID = %s, ActuatorID = %s, Datum = %s, waarde = %s, Toestand = %s, Commentaar = %s  WHERE MeetwaardeID = %s")
-        parameters= [SensorID, ActuatorID, Datum,Waarde,Toestand,Commentaar,MeetwaardeID]
+    def update_meting(DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar, MeetwaardeID):
+        sql=("UPDATE Metingen set DeviceID = %s, Datum = %s, waarde = %s, Toestand = %s, Commentaar = %s  WHERE MeetwaardeID = %s")
+        parameters= [DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar, MeetwaardeID]
         return Database.execute_sql(sql, parameters)
 
 
