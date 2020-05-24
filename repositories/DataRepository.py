@@ -47,7 +47,7 @@ class DataRepository:
 
     @staticmethod
     def create_Device(TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving):
-        sql='INSERT INTO Device (TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving) VALUES (%s,%s,%s,%s,%s)'
+        sql='INSERT INTO Device (TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving) VALUES (%s,%s,%s,%s,%s,%s)'
         parameters = [TypeDevice, Naam, Eenheid, Merk, Aankoopprijs, Beschrijving]
         return Database.execute_sql(sql, parameters)
 
@@ -67,9 +67,9 @@ class DataRepository:
 
 
     @staticmethod
-    def read_meting(MeetwaardeID):
-        sql="SELECT * FROM Metingen WHERE MeetwaardeID = %s"
-        parameters=[MeetwaardeID]
+    def read_meting(MetingID):
+        sql="SELECT * FROM Metingen WHERE  MetingID = %s"
+        parameters=[MetingID]
         return Database.get_one_row(sql, parameters)   
 
     @staticmethod
@@ -79,9 +79,9 @@ class DataRepository:
         return Database.execute_sql(sql, parameters)
 
     @staticmethod
-    def update_meting(DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar, MeetwaardeID):
-        sql=("UPDATE Metingen set DeviceID = %s, Datum = %s, waarde = %s, Toestand = %s, Commentaar = %s  WHERE MeetwaardeID = %s")
-        parameters= [DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar, MeetwaardeID]
+    def update_meting(DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar,  MetingID):
+        sql=("UPDATE Metingen set DeviceID = %s, Datum = %s, waarde = %s, Power = %s, Intensiteit = %s, Commentaar = %s  WHERE  MetingID = %s")
+        parameters= [DeviceID, Datum, Waarde, Power, Intensiteit, Commentaar, MetingID]
         return Database.execute_sql(sql, parameters)
 
 
