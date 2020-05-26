@@ -2,7 +2,7 @@ from RPi import GPIO
 import time
 
 
-class PIR():
+class Pir():
     def __init__(self,pin):
         self.pin = pin
         self.counter = 0

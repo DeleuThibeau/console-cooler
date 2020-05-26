@@ -12,10 +12,12 @@ import json
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # Code voor componenten
-from helpers.klasseknop import Button
 from helpers.Mcp import Mcp
-from helpers.PIR import PIR
+from helpers.Pir import Pir
+from helpers.Ventilator import Ventilator
 from helpers.OneWire import OneWire
+from helpers.Ldr import Ldr
+# from helpers.UltraSonic import UltraSonic
 
 from RPi import GPIO
 import spidev
@@ -24,34 +26,11 @@ import spidev
 #Globale variabelen
 Mcp = Mcp()
 OneWire = OneWire()
-Pir = PIR()
+Pir = Pir(20)
+Ldr = Ldr(0)
+
 date = datetime.now()
 json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
-
-
-
-# Functies componenten
-def setup():
-    GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)
-    sensorid = ["28-011610c65dee"]
-    temp = {}
-    
-
-
-def spi_lichtsensor(waarde):
-    global Mcp
-    Mcp.read_channel(waarde)
-    return Mcp.read_channel(waarde)
-
-
-def omzetting_lichtsensor(byte):
-    global percentage_lichtsensor
-    percentage_lichtsensor = (byte/1023) * 100
-    percentage_lichtsensor = 100-percentage_lichtsensor
-    # print(
-    #     f"De lichtsensor heeft een percentage van: {percentage_lichtsensor:.2f}%")
-    return percentage_lichtsensor
 
 
 #--------------------------flask/routes/sockets----------------------
@@ -82,14 +61,17 @@ def socket_ldr():
     global date
     global json_date
     global OneWire
-    setup()
+
+
+    #-------------------------Ventilator----------------------------
+    # vent
     
     #----------------------------LDR--------------------------------
 
-    lichtsensor = spi_lichtsensor(0)
+    byte = Ldr.spi_lichtsensor()
     Mcp.closepi
+    ldr = Ldr.omzetting_lichtsensor(byte)
 
-    ldr = omzetting_lichtsensor(lichtsensor)
     DataRepository.create_meting(2,date,ldr,'OFF','Geen commentaar')
     data_ldr = DataRepository.read_meting(2)
     data_ldr.update({'Datum': json_date})
@@ -108,71 +90,10 @@ def socket_ldr():
     socketio.emit('B2F_OneWire_weergeven', {'Onewire': data_temp})
 
 
-# @socketio.on('connect')
-# def socket_oneWire():
-#     global OneWire
-#     global date
-#     global json_date
-#     setup()
-
-#     temp = OneWire.read_one_wire()
-#     DataRepository.create_meting(1,date,temp,'OFF','Geen commentaar')
-#     data_temp = DataRepository.read_meting(1)
-#     data_temp.update({'Datum': json_date})
-#     print(f"json van temp = \n {data_temp}")
-
-#     socketio.emit('B2F_OneWire_weergeven', {'Onewire': data_temp})
-
-    
-
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  
 
-# try:
-#     setup()
-#     Mcp = Mcp()
-#     OneWire = OneWire()
-
-#     while True:
-#         #---Huidige tijd ophalen voor te schrijven naar databank---
-#         date = datetime.now()
-
-#         #-----------------LDR------------------------------
-#         lichtsensor = spi_lichtsensor(0)
-#         Mcp.closepi
-
-#         ldr = omzetting_lichtsensor(lichtsensor)
-        
-#         DataRepository.create_meting(2,date,ldr,'OFF','Geen commentaar')
-#         data_ldr = DataRepository.read_meting(2)
-#         # print(f"json van LDR = \n {data_ldr}\n\n")
-
-#         time.sleep(1)
-
-#         #---------------One Wire----------------------------
-#         # temp = OneWire.read_one_wire()
-#         # DataRepository.create_meting(1,date,temp,'OFF','Geen commentaar')
-#         # data_temp = DataRepository.read_metingen()
-#         # print(f"json van temp = \n {data_temp}")
-
-#         # DataRepository.create_metingen(1,date,temp,'OFF','Geen commentaar',2,date,ldr,'OFF','Geen commentaar')
-
-
-#         socketio.emit('B2F_LDR_weergeven', {'ldr': data_ldr})
-        
-
-#         time.sleep(5)
-
-
-#     # knop1.on_press(lees_knop)
-
-# except Exception as ex:
-#     print(ex)
-
-# finally:
-#     print('\n Script is ten einde, cleanup is klaar')
-#     GPIO.cleanup()
     
 
 
