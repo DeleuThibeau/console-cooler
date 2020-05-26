@@ -14,9 +14,11 @@ class Pir():
         pin =GPIO.input(self.pin)
         if pin==0:                 #When output from motion sensor is LOW
             print("No intruders",pin)
-            print(pin)
+            
         elif pin==1:               #When output from motion sensor is HIGH
             print("Intruder detected",pin)
             print(pin)
+
+        return pin
             
 

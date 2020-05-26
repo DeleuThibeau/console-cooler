@@ -11,7 +11,7 @@ import json
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# Code voor componenten
+# Code voor componenten via helper klasses
 from helpers.Mcp import Mcp
 from helpers.Pir import Pir
 from helpers.Ventilator import Ventilator
@@ -25,9 +25,14 @@ import spidev
 
 #Globale variabelen
 Mcp = Mcp()
+
 OneWire = OneWire()
+temp = OneWire.read_one_wire()
+
 Pir = Pir(20)
 Ldr = Ldr(0)
+
+Ventilator = Ventilator(18,temp,20)
 
 date = datetime.now()
 json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
@@ -64,7 +69,7 @@ def socket_ldr():
 
 
     #-------------------------Ventilator----------------------------
-    # vent
+    ActuatorPower = Ventilator.PWM()
     
     #----------------------------LDR--------------------------------
 
@@ -72,7 +77,7 @@ def socket_ldr():
     Mcp.closepi
     ldr = Ldr.omzetting_lichtsensor(byte)
 
-    DataRepository.create_meting(2,date,ldr,'OFF','Geen commentaar')
+    DataRepository.create_meting(2,date,ldr,ActuatorPower,'Geen commentaar')
     data_ldr = DataRepository.read_meting(2)
     data_ldr.update({'Datum': json_date})
     print(f"json van LDR = \n {data_ldr}\n\n")
@@ -82,7 +87,7 @@ def socket_ldr():
     #--------------------------One Wire-----------------------------
 
     temp = OneWire.read_one_wire()
-    DataRepository.create_meting(1,date,temp,'OFF','Geen commentaar')
+    DataRepository.create_meting(1,date,temp,ActuatorPower,'Geen commentaar')
     data_temp = DataRepository.read_meting(1)
     data_temp.update({'Datum': json_date})
     print(f"json van temp = \n {data_temp}")

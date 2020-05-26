@@ -1,8 +1,9 @@
 from RPi import GPIO
+from helpers.Pir import Pir
 import time
 
 class Ventilator():
-    def __init__(self, pin, temperatuur, set_temp):
+    def __init__(self, pin, temperatuur=21, set_temp=0):
         self.pin = pin
         self.temperatuur = temperatuur
         self.set_temp = set_temp
@@ -11,6 +12,7 @@ class Ventilator():
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin,GPIO.OUT)
         self.pwm_motor = GPIO.PWM(pin,1000)
+        self.Pir = Pir(20)
 
 
     def PWM(self):
@@ -30,6 +32,11 @@ class Ventilator():
         if self.temperatuur < self.set_temp + 1.5:
             self.pwm_motor.stop()
             self.ActuatorPower = 'OFF'
+
+        if self.Pir.registratie == 0:
+            self.pwm_motor.stop()
+            self.ActuatorPower = 'OFF'
+
 
         return self.ActuatorPower
 
