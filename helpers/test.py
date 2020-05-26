@@ -1,13 +1,17 @@
 from RPi import GPIO
 import time
 from PIR import PIR
+from Ventilator import Ventilator
 
 Pir = PIR(20)
-Vent = Ventilator()
+Vent = Ventilator(18,25,20)
 
 try: 
     while True:
-        Pir.registratie()
+        # Pir.registratie()
+        x = Vent.PWM()
+        print(x)
+
         time.sleep(1)
 
 

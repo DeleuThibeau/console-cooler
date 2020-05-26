@@ -9,8 +9,8 @@ class Ventilator():
         self.ActuatorPower = ''
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(motor,GPIO.OUT)
-        self.pwm_motor = GPIO.PWM(motor,1000)
+        GPIO.setup(pin,GPIO.OUT)
+        self.pwm_motor = GPIO.PWM(pin,1000)
 
 
     def PWM(self):
