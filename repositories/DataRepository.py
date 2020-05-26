@@ -67,9 +67,9 @@ class DataRepository:
 
 
     @staticmethod
-    def read_meting(MetingID):
-        sql="SELECT * FROM Metingen WHERE  MetingID = %s"
-        parameters=[MetingID]
+    def read_meting(DeviceID):
+        sql="SELECT * FROM Metingen WHERE  DeviceID = %s ORDER BY MetingID DESC Limit 1"
+        parameters=[DeviceID]
         return Database.get_one_row(sql, parameters)   
 
     @staticmethod
@@ -83,5 +83,11 @@ class DataRepository:
         sql=("UPDATE Metingen set DeviceID = %s, Datum = %s, SensorWaarde = %s, ActuatorPower = %s, Commentaar = %s  WHERE  MetingID = %s")
         parameters= [DeviceID, Datum, SensorWaarde, ActuatorPower, Commentaar, MetingID]
         return Database.execute_sql(sql, parameters)
+
+    # @staticmethod
+    # def create_metingen(DeviceID1, Datum1, SensorWaarde1, ActuatorPower1, Commentaar1,DeviceID2, Datum2, SensorWaarde2, ActuatorPower2, Commentaar2):
+    #     sql='INSERT INTO Metingen (DeviceID, Datum, SensorWaarde, ActuatorPower, Commentaar) VALUES ((%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s))'
+    #     parameters = [DeviceID1, Datum1, SensorWaarde1, ActuatorPower1, Commentaar1,DeviceID2, Datum2, SensorWaarde2, ActuatorPower2, Commentaar2]
+    #     return Database.execute_sql(sql, parameters)
 
 

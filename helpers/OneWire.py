@@ -5,6 +5,7 @@ class OneWire:
     def __init__(self):
         self. sensorid = ["28-011610c65dee"]
         self.temp = {}
+        # self.gewenste_temp = gewenste_temp
 
     def read_one_wire(self):
         for sensor in range(len(self.sensorid)):
@@ -18,6 +19,10 @@ class OneWire:
             temperatuur = self.temp[sensor]
             # print(f'De huidige temperatuur is {temperatuur} °C')
         return temperatuur
+    
+    # def ingestelde_temp(self, gewenste_temp):
+         
+
 
     def test(self):
         x = print('Hallo')

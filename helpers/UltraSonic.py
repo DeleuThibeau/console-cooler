@@ -1,5 +1,7 @@
 import RPi.GPIO as GPIO
 import time
+from datetime import datetime
+
 GPIO.setmode(GPIO.BCM)
 
 Trig = 17
@@ -12,6 +14,9 @@ GPIO.setup(Echo, GPIO.IN)
 
 try:
     while True:
+        date = datetime.now()
+        str_date = str(date)
+        print(str_date)
 
         GPIO.output(Trig, False)
         print('Wachten op sensor')
