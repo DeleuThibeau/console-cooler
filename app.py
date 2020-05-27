@@ -32,8 +32,7 @@ temp = OneWire.read_one_wire()
 
 Pir = Pir(20)
 Ldr = Ldr(0)
-
-Ventilator = Ventilator(18,temp,20)
+Ventilator = Ventilator(18,temp,10)
 
 date = datetime.now()
 json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
@@ -70,6 +69,7 @@ def socket_ldr():
 
 
     #-------------------------Ventilator----------------------------
+
     ActuatorPower = Ventilator.PWM()
     
     #----------------------------LDR--------------------------------
@@ -95,30 +95,22 @@ def socket_ldr():
 
     socketio.emit('B2F_OneWire_weergeven', {'Onewire': data_temp})
 
+    #-----------------------------PIR-------------------------------
+    #Didnt have enough time to test properly
+
+
+    #-------------------------Ultra Sonic---------------------------
+    #Almost done
+
+    #-----------------------------LCD-------------------------------
+    # In Progress
+
+
+    # DataRepository.update_Device('sensor','LDR','Lichtsterkte','Onbekend',1,"Een lichtweerstand die wordt gebruikt om de lichtintensiteit te meten",2)
+    # DataRepository.create_Device('Actuator','Ventilator', 'Wind','chinese brol','19','Een ventilator om mijn console cool te houden')
+
+
 
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  
-
-    
-
-
-# knop1.on_press(lees_knop)
-
-# DataRepository.create_sensor('One wire','Een warmte sensor',4,'temperatuur','graden celcius')
-
-# DataRepository.create_sensor('PIR Motion sensor','Een bewegingsensor',9,'motione','m/s')
-
-# DataRepository.create_sensor('Ultra sonic sensor','een afstand sensor die wordt gebruikt om de luchtsnelheid te berekenen',5,'afstand','meter')
-
-# DataRepository.create_actuator('Ventilator','Guncaizhu','Een koelingsapparaat dat werkt op 5V',14.99,'Rotatie','Lucht')
-
-# DataRepository.update_Device('Sensor','PIR Motion sensor','m/s', 'Onbekend', 9,'Een bewegingsensor',2)
-
-# DataRepository.update_Device('Sensor','One Wire temperatuur sensor','Graden celcius', 'Dallas', 2,'Een temperatuursensor dat werkt via een MCP3008',1)
-
-
-
-# date = datetime.now()
-
-# DataRepository.create_meting(4,1,date,0,0,'Geen commentaar')
