@@ -1,25 +1,23 @@
 from RPi import GPIO
 import time
-from PIR import PIR
-from Ventilator import Ventilator
+from LCD import LCD
 
-Pir = PIR(20)
-Vent = Ventilator(18,25,20)
+GPIO.setmode(GPIO.BCM)
+# Lcd = LCD(23,24,25,12,16,21,26,19,13,6)
+lcd = LCD(23,24,6,13,19,26,21,16,12,25)
+# lcd= LCD(False,24,23,6,13,19,26,21,16,12,25)
 
-try: 
+try:
     while True:
-        # Pir.registratie()
-        x = Vent.PWM()
-        print(x)
-
+        lcd.tekst()
         time.sleep(1)
+        
 
+except Exception as ex:
+    print(ex)
 
-except KeyboardInterrupt as e:
-    print(e)
-    # GPIO.output(motor,GPIO.LOW)
 
 finally:
+    print('\n Script is ten einde, cleanup is klaar')
     GPIO.cleanup()
-    print("Script has stopped")        
         
