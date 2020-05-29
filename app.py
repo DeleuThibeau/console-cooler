@@ -68,7 +68,7 @@ def socket_ldr():
     global OneWire
 
 
-    #-------------------------Ventilator----------------------------
+    # -------------------------Ventilator----------------------------
 
     ActuatorPower = Ventilator.PWM()
     
@@ -78,8 +78,8 @@ def socket_ldr():
     Mcp.closepi
     ldr = Ldr.omzetting_lichtsensor(byte)
 
-    DataRepository.create_meting(2,date,ldr,ActuatorPower,'Geen commentaar')
-    data_ldr = DataRepository.read_meting(2)
+    DataRepository.create_meting(6,date,ldr,ActuatorPower,'Commentaar voor MVP1')
+    data_ldr = DataRepository.read_meting(6)
     data_ldr.update({'Datum': json_date})
     print(f"json van LDR = \n {data_ldr}\n\n")
 
@@ -88,8 +88,8 @@ def socket_ldr():
     #--------------------------One Wire-----------------------------
 
     temp = OneWire.read_one_wire()
-    DataRepository.create_meting(1,date,temp,ActuatorPower,'Geen commentaar')
-    data_temp = DataRepository.read_meting(1)
+    DataRepository.create_meting(7,date,temp,ActuatorPower,'Geen commentaar')
+    data_temp = DataRepository.read_meting(7)
     data_temp.update({'Datum': json_date})
     print(f"json van temp = \n {data_temp}")
 
@@ -106,11 +106,20 @@ def socket_ldr():
     # In Progress
 
 
-    # DataRepository.update_Device('sensor','LDR','Lichtsterkte','Onbekend',1,"Een lichtweerstand die wordt gebruikt om de lichtintensiteit te meten",2)
-    # DataRepository.create_Device('Actuator','Ventilator', 'Wind','chinese brol','19','Een ventilator om mijn console cool te houden')
-
-
 
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  
+
+
+    # DataRepository.update_Device('sensor','LDR','Lichtsterkte','Onbekend',1,"Een lichtweerstand die wordt gebruikt om de lichtintensiteit te meten",2)
+
+    # DataRepository.create_Device('Actuator','Ventilator', 'Wind','chinese brol','19','Een ventilator om mijn console cool te houden')
+
+    # DataRepository.create_Device('Sensor','LDR', 'Licht','onbekend','1','lichtweerstand die wordt gebruikt om de lichtsterkte te meten')
+
+    # DataRepository.create_Device('Sensor','OneWire', 'Temerpatuur','Dallas','3','Een warmtesensor om de temperatuur te meten')
+
+    # DataRepository.create_Device('Sensor','PIR Motion sensor', 'm/s','Velleman','6','Een bewegingssensor die als knop dient')
+
+    # DataRepository.create_Device('Sensor','Ultra Sonic', 'm/s','Velleman','4','Een sensor die wordt gebruikt om de airflow te berekenen/weer te geven')
