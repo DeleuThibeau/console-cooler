@@ -2,43 +2,45 @@ import RPi.GPIO as GPIO
 import time
 from datetime import datetime
 
-GPIO.setmode(GPIO.BCM)
+class UltraSonic:
+    def __init__(self,echo, trig): 
+        self.echo = echo
+        self.trig = trig
+        self.__setup()
+        self.distance = 0
 
-Trig = 17
-Echo = 27
+    def __setup(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.trig, GPIO.OUT)
+        GPIO.setup(self.echo, GPIO.IN)
 
-print('Afstand meten in progress')
-
-GPIO.setup(Trig, GPIO.OUT)
-GPIO.setup(Echo, GPIO.IN)
-
-try:
-    while True:
-
-        GPIO.output(Trig, False)
+    def meting(self):
+        GPIO.output(self.trig, False)
         time.sleep(2)
 
-        GPIO.output(Trig, True)
+        GPIO.output(self.trig, True)
         time.sleep(0.00001)
-        GPIO.output(Trig, False)
+        GPIO.output(self.trig, False)
 
-        while GPIO.input(Echo) == 0:
+        while GPIO.input(self.echo) == 0:
             pulse_start = time.time()
 
-        while GPIO.input(Echo) == 1:
+        while GPIO.input(self.echo) == 1:
             puls_end = time.time()
 
         pulse_duration = puls_end - pulse_start
 
-        distance = pulse_duration*17150
-        adj_distance = distance*0.98
+        self.distance = pulse_duration*17150
+        # adj_distance = self.distance*0.98
 
-        distance = round(distance, 2)
-        print(f'Distance: {distance} cm')
+        self.distance = round(self.distance, 2)
 
-except Exception as ex:
-    print(ex)
+        #Distance sensor geeft waarde van rond de 1000 als er geen verandering is in afstand => Delen zodat hij 0 geeft (=> Geen verandering)
 
-finally:
-    print('\n Script is ten einde, cleanup is klaar')
-    GPIO.cleanup()
+        if self.distance > 1000:
+            self.distance = self.distance /101900000
+        
+        # print(f'Distance: {self.distance:.2f} cm')
+
+        return self.distance
+        

@@ -8,6 +8,7 @@
 		}
 	],
 	"settings": {
-		"liveServer.settings.multiRootWorkspaceName": "html"
+		"liveServer.settings.multiRootWorkspaceName": "html",
+		"python.pythonPath": "/usr/bin/python3"
 	}
 }

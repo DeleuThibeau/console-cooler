@@ -1,6 +1,6 @@
 # pylint: skip-file
 from repositories.DataRepository import DataRepository
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
@@ -9,34 +9,44 @@ from datetime import datetime
 import threading
 import json
 import subprocess
+from RPi import GPIO
+import spidev
 
-# -----------------------------------------------------------------------------------------------------------------------------------
+#------------------Code voor componenten via helper klasses----------------
 
-# Code voor componenten via helper klasses
 from helpers.Mcp import Mcp
 from helpers.Pir import Pir
 from helpers.Ventilator import Ventilator
 from helpers.OneWire import OneWire
 from helpers.Ldr import Ldr
-# from helpers.UltraSonic import UltraSonic
+from helpers.UltraSonic import UltraSonic
+from helpers.Lcd import LCD
 
-from RPi import GPIO
-import spidev
+#-------------------------------Variabelen----------------------------
 
-
-#Globale variabelen
+#LDR weerstand variabelen
 Mcp = Mcp()
+Ldr = Ldr(0)
 
+#OneWire variabelen
 OneWire = OneWire()
 temp = OneWire.read_one_wire()
 
-Pir = Pir(20)
-Ldr = Ldr(0)
-Ventilator = Ventilator(18,temp,10)
+#PIR variabele
+Pir = Pir()
+toestand = Pir.registratie()
+print(toestand)
 
-date = datetime.now()
-json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
+#Ventilator variabele
+Ventilator = Ventilator(toestand,18,temp,10)
+print(temp)
+print(Ventilator.PWM())
 
+#UltraSonic Variabalen
+ultra = UltraSonic(27,17)
+
+#LCD variabale
+lcd = LCD()
 
 #--------------------------flask/routes/sockets----------------------
 
@@ -48,10 +58,38 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 CORS(app)
 
 
+endpoint = '/api/v1'
+
+
 # API ENDPOINTS
 @app.route('/')
 def hallo():
     return "Server is running, er zijn momenteel geen API endpoints beschikbaar."
+
+
+@app.route(endpoint + '/metingen', methods=['GET'])
+def get_metingen():
+    if request.method == 'GET':
+        s = DataRepository.read_metingen()
+        return jsonify(Metingen=s), 200
+
+@app.route(endpoint + '/metingen/<DeviceID>', methods=['GET'])
+def get_metingen_device(DeviceID):
+    if request.method == 'GET':
+        s = DataRepository.read_metingen_device(DeviceID)
+        return jsonify(Metingen_Device=s), 200
+
+@app.route(endpoint + '/devices', methods=['GET'])
+def get_all_devices():
+    if request.method == 'GET':
+        s = DataRepository.read_devices()
+        return jsonify(Devices=s), 200
+
+@app.route(endpoint + '/<device>', methods=['GET'])
+def get_device(DeviceID):
+    if request.method == 'GET':
+        s = DataRepository.read_device(DeviceID)
+        return jsonify(Device=s), 200
 
 
 # SOCKET IO
@@ -59,67 +97,62 @@ def hallo():
 def initial_connection():
     print('A new client connect')
 
-
-@socketio.on('connect')
-def socket_ldr():
-    global Mcp
-    global date
-    global json_date
-    global OneWire
-
-
-    # -------------------------Ventilator----------------------------
-
-    ActuatorPower = Ventilator.PWM()
     
-    #----------------------------LDR--------------------------------
+#----------------------------------LDR-------------------------------
 
-    byte = Ldr.spi_lichtsensor()
-    Mcp.closepi
-    ldr = Ldr.omzetting_lichtsensor(byte)
+def create_ldr_metingen():
+    while True:
+        ActuatorPower = Ventilator.PWM()
+        # print(ActuatorPower)
+        date = datetime.now()
+        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
-    DataRepository.create_meting(6,date,ldr,ActuatorPower,'Commentaar voor MVP1')
-    data_ldr = DataRepository.read_meting(6)
-    data_ldr.update({'Datum': json_date})
-    print(f"json van LDR = \n {data_ldr}\n\n")
+        byte = Ldr.spi_lichtsensor()
+        Mcp.closepi
+        ldr = Ldr.omzetting_lichtsensor(byte)
+        DataRepository.create_meting(6,date,ldr,ActuatorPower,'Geen commentaar',20)
+        time.sleep(60)
 
-    socketio.emit('B2F_LDR_weergeven', {'ldr': data_ldr})
+#------------------------------One Wire-----------------------------
 
-    #--------------------------One Wire-----------------------------
+def create_oneWire_metingen():
+    while True:
+        ActuatorPower = Ventilator.PWM()
+        # print(ActuatorPower)
+        date = datetime.now()
+        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
-    temp = OneWire.read_one_wire()
-    DataRepository.create_meting(7,date,temp,ActuatorPower,'Geen commentaar')
-    data_temp = DataRepository.read_meting(7)
-    data_temp.update({'Datum': json_date})
-    print(f"json van temp = \n {data_temp}")
+        temp = OneWire.read_one_wire()
+        DataRepository.create_meting(7,date,temp,ActuatorPower,'Geen commentaar',25)
+        time.sleep(60)
 
-    socketio.emit('B2F_OneWire_weergeven', {'Onewire': data_temp})
+#----------------------------Ultra Sonic----------------------------
 
-    #-----------------------------PIR-------------------------------
-    #Didnt have enough time to test properly
+def create_ultraSonic_metingen():
+    while True:
+        ActuatorPower = Ventilator.PWM()
+        # print(ActuatorPower)
+        date = datetime.now()
+        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
+        afstand = ultra.meting()
+        DataRepository.create_meting(9,date,afstand,ActuatorPower,'Geen commentaar',25)
+        time.sleep(60)
 
-    #-------------------------Ultra Sonic---------------------------
-    #Almost done
+#------------------------------LCD----------------------------------
 
-    #-----------------------------LCD-------------------------------
-    # In Progress
+def lcd_display():
+    print('test')
+    while True:
+        lcd.ipAdres()
+        time.sleep(60)
 
+threading.Timer(60, create_ldr_metingen).start()
+threading.Timer(60, create_oneWire_metingen).start()
+threading.Timer(1, create_ultraSonic_metingen).start()
+threading.Timer(60, lcd_display).start()
 
-
+#----------------------if__name__='__main__'------------------------
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  
-
-
-    # DataRepository.update_Device('sensor','LDR','Lichtsterkte','Onbekend',1,"Een lichtweerstand die wordt gebruikt om de lichtintensiteit te meten",2)
-
-    # DataRepository.create_Device('Actuator','Ventilator', 'Wind','chinese brol','19','Een ventilator om mijn console cool te houden')
-
-    # DataRepository.create_Device('Sensor','LDR', 'Licht','onbekend','1','lichtweerstand die wordt gebruikt om de lichtsterkte te meten')
-
-    # DataRepository.create_Device('Sensor','OneWire', 'Temerpatuur','Dallas','3','Een warmtesensor om de temperatuur te meten')
-
-    # DataRepository.create_Device('Sensor','PIR Motion sensor', 'm/s','Velleman','6','Een bewegingssensor die als knop dient')
-
-    # DataRepository.create_Device('Sensor','Ultra Sonic', 'm/s','Velleman','4','Een sensor die wordt gebruikt om de airflow te berekenen/weer te geven')
