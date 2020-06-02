@@ -12,7 +12,7 @@ import subprocess
 from RPi import GPIO
 import spidev
 
-#------------------Code voor componenten via helper klasses----------------
+#---------------------------------------------------Code voor componenten via helper klasses------------------------------------------------------------
 
 from helpers.Mcp import Mcp
 from helpers.Pir import Pir
@@ -22,7 +22,7 @@ from helpers.Ldr import Ldr
 from helpers.UltraSonic import UltraSonic
 from helpers.Lcd import LCD
 
-#-------------------------------Variabelen----------------------------
+#-------------------------------------------------------------Klasse variabelen------------------------------------------------------------------------
 
 #LDR weerstand variabelen
 Mcp = Mcp()
@@ -48,7 +48,7 @@ ultra = UltraSonic(27,17)
 #LCD variabale
 lcd = LCD()
 
-#--------------------------flask/routes/sockets----------------------
+#------------------------------------------------------------flask/routes/sockets-----------------------------------------------------------------------
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'Hier mag je om het even wat schrijven, zolang het maar geheim blijft en een string is'
@@ -91,14 +91,14 @@ def get_device(DeviceID):
         s = DataRepository.read_device(DeviceID)
         return jsonify(Device=s), 200
 
-
 # SOCKET IO
 @socketio.on('connect')
 def initial_connection():
     print('A new client connect')
 
-    
-#----------------------------------LDR-------------------------------
+#-------------------------------------------------------CREATIE METINGEN / LCD DISPLAY----------------------------------------------------------------------
+
+#--------------------------------LDR--------------------------------
 
 def create_ldr_metingen():
     while True:
@@ -147,12 +147,21 @@ def lcd_display():
         lcd.ipAdres()
         time.sleep(60)
 
+#---------------------------Threads---------------------------------
+
+#LDR
 threading.Timer(60, create_ldr_metingen).start()
+
+#TEMPERATUUR
 threading.Timer(60, create_oneWire_metingen).start()
+
+#ULTRA SONIC
 threading.Timer(1, create_ultraSonic_metingen).start()
+
+#LCD
 threading.Timer(60, lcd_display).start()
 
-#----------------------if__name__='__main__'------------------------
+#------------------------------------------------------------if__name__='__main__'------------------------------------------------------------------------
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  

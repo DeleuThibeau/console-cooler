@@ -107,7 +107,9 @@ class LCD:
     def ipAdres(self):
         ip_adres = subprocess.check_output(['hostname', '--all-ip-addresses']).decode('utf-8')
         vraag = str(ip_adres)
-        vraag = vraag[:24]
+        vraag = vraag[13:27]
+        vraag = 'Console Cooler ' + vraag
+        print(vraag)
         self.send_instruction(0b00000001)  # clear display/cursor home
         self.tekst(vraag)
 
