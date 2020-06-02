@@ -15,7 +15,7 @@ import spidev
 #---------------------------------------------------Code voor componenten via helper klasses------------------------------------------------------------
 
 from helpers.Mcp import Mcp
-from helpers.Pir import Pir
+from helpers.PIR import Pir
 from helpers.Ventilator import Ventilator
 from helpers.OneWire import OneWire
 from helpers.Ldr import Ldr
@@ -33,14 +33,31 @@ OneWire = OneWire()
 temp = OneWire.read_one_wire()
 
 #PIR variabele
-Pir = Pir()
-toestand = Pir.registratie()
-print(toestand)
+pir = Pir()
+
+def registratie():
+    pir.registratie()
+    while True:
+        print('hallo')
+
+threading.Timer(1, registratie).start()
+
+Ventilator = Ventilator(1, 18, temp, 30)
+
+#---------------------------Ventilator------------------------------
+
+# def thread_ventilator():
+#     toestand_pir =threading.Timer(1, registratie).start()
+#     print(toestand_pir)
+#     while True:
+#         vent.PWM()
+#         print('hallo')
+
 
 #Ventilator variabele
-Ventilator = Ventilator(toestand,18,temp,10)
-print(temp)
-print(Ventilator.PWM())
+# Ventilator = Ventilator(1,18,temp)
+# print(temp)
+# print(Ventilator.PWM())
 
 #UltraSonic Variabalen
 ultra = UltraSonic(27,17)
@@ -142,10 +159,14 @@ def create_ultraSonic_metingen():
 #------------------------------LCD----------------------------------
 
 def lcd_display():
-    print('test')
+    # print('test')
     while True:
         lcd.ipAdres()
         time.sleep(60)
+
+
+#----------------------------PIR-----------------------------------
+
 
 #---------------------------Threads---------------------------------
 
@@ -160,6 +181,10 @@ threading.Timer(1, create_ultraSonic_metingen).start()
 
 #LCD
 threading.Timer(60, lcd_display).start()
+
+#Ventilator
+# threading.Timer(1,thread_ventilator).start()
+
 
 #------------------------------------------------------------if__name__='__main__'------------------------------------------------------------------------
 

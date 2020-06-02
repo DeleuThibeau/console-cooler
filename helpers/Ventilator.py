@@ -2,12 +2,12 @@ from RPi import GPIO
 import time
 
 class Ventilator():
-    def __init__(self,toestand=0, pin=18, temperatuur=21, set_temp=0):
+    def __init__(self,toestand = 1, pin=18, temperatuur=21, set_temp=20):
         self.pin = pin
         self.temperatuur = temperatuur
         self.set_temp = set_temp
         self.ActuatorPower = ''
-        self.toestand = 0
+        self.toestand = toestand
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin,GPIO.OUT)
@@ -33,9 +33,20 @@ class Ventilator():
                 self.pwm_motor.stop()
                 self.ActuatorPower = 'OFF'
 
+            # print(self.pin)
+            # print(self.toestand)
+            # print(self.temperatuur)
+            # print(self.set_temp)
+            # print(self.ActuatorPower)
+
         else:
             self.pwm_motor.stop()
             self.ActuatorPower = 'OFF'
+            # print(self.pin)
+            # print(self.toestand)
+            # print(self.temperatuur)
+            # print(self.set_temp)
+            # print(self.ActuatorPower)
 
 
         return self.ActuatorPower

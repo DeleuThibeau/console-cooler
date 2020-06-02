@@ -12,17 +12,19 @@ class Pir():
         self.counter = 0
 
     def registratie(self):
-        self.pin =GPIO.input(self.pin)
-        if self.pin==0:                 #When output from motion sensor is LOW
-            # print(self.counter)
-            self.counter = 0
-            
-        elif self.pin==1:               #When output from motion sensor is HIGH
-            self.counter += 1
-            # print(self.counter)
-            if self.counter > 1:
-                self.counter -= 2
 
+        waarde =GPIO.input(self.pin)
+        if waarde==1:                 
+            # print(self.counter)
+            self.counter = 1
+            
+        elif waarde==0:               
+            self.counter = 0
+            # print(self.counter)
+
+        print(self.counter)
+        
+        # time.sleep(5)
         return self.counter
             
 
