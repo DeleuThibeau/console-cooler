@@ -30,40 +30,18 @@ Ldr = Ldr(0)
 
 #OneWire variabelen
 OneWire = OneWire()
-temp = OneWire.read_one_wire()
 
 #PIR variabele
 pir = Pir()
-
-def registratie():
-    pir.registratie()
-    while True:
-        print('hallo')
-
-threading.Timer(1, registratie).start()
-
-Ventilator = Ventilator(1, 18, temp, 30)
-
-#---------------------------Ventilator------------------------------
-
-# def thread_ventilator():
-#     toestand_pir =threading.Timer(1, registratie).start()
-#     print(toestand_pir)
-#     while True:
-#         vent.PWM()
-#         print('hallo')
-
-
-#Ventilator variabele
-# Ventilator = Ventilator(1,18,temp)
-# print(temp)
-# print(Ventilator.PWM())
 
 #UltraSonic Variabalen
 ultra = UltraSonic(27,17)
 
 #LCD variabale
 lcd = LCD()
+
+#Ventilator
+vent = Ventilator(1, 18)
 
 #------------------------------------------------------------flask/routes/sockets-----------------------------------------------------------------------
 
@@ -108,82 +86,81 @@ def get_device(DeviceID):
         s = DataRepository.read_device(DeviceID)
         return jsonify(Device=s), 200
 
-# SOCKET IO
-@socketio.on('connect')
-def initial_connection():
-    print('A new client connect')
 
 #-------------------------------------------------------CREATIE METINGEN / LCD DISPLAY----------------------------------------------------------------------
 
+
 #--------------------------------LDR--------------------------------
+def read_ldr_metingen():
+    byte = Ldr.spi_lichtsensor()
+    Mcp.closepi()
+    ldr = Ldr.omzetting_lichtsensor(byte)
+    return ldr
 
-def create_ldr_metingen():
-    while True:
-        ActuatorPower = Ventilator.PWM()
-        # print(ActuatorPower)
-        date = datetime.now()
-        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
+def create_ldr_metingen(date, ldr, ActuatorPower, ID=6, commentaar='Geen commentaar', ingestelde_temp=20):
+    DataRepository.create_meting(ID,date,ldr,ActuatorPower,commentaar,ingestelde_temp)
 
-        byte = Ldr.spi_lichtsensor()
-        Mcp.closepi
-        ldr = Ldr.omzetting_lichtsensor(byte)
-        DataRepository.create_meting(6,date,ldr,ActuatorPower,'Geen commentaar',20)
-        time.sleep(60)
 
 #------------------------------One Wire-----------------------------
 
-def create_oneWire_metingen():
-    while True:
-        ActuatorPower = Ventilator.PWM()
-        # print(ActuatorPower)
-        date = datetime.now()
-        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
+def read_onewire_metingen():
+    temp = OneWire.read_one_wire()
+    return temp
 
-        temp = OneWire.read_one_wire()
-        DataRepository.create_meting(7,date,temp,ActuatorPower,'Geen commentaar',25)
-        time.sleep(60)
+def create_oneWire_metingen(date,temp, ActuatorPower, ID=7, commentaar='Geen commentaar', ingestelde_temp=20):
+    DataRepository.create_meting(ID,date,temp,ActuatorPower,commentaar,ingestelde_temp)
+    
 
 #----------------------------Ultra Sonic----------------------------
 
-def create_ultraSonic_metingen():
+def read_ultrasonic_metingen():
+    afstand = ultra.meting()
+    return afstand
+
+def create_ultraSonic_metingen(date,ultrasonic, ActuatorPower, ID=9, commentaar='Geen commentaar', ingestelde_temp=20):
+    DataRepository.create_meting(ID,date,ultrasonic, ActuatorPower, commentaar, ingestelde_temp)
+
+#--------------------------------PIR--------------------------------
+
+def read_pir():
+    toestand = pir.registratie()
+    return toestand
+
+#-------------------------------LCD---------------------------------
+
+def lcd_display():
+    lcd.ipAdres()
+
+
+
+def total():
     while True:
-        ActuatorPower = Ventilator.PWM()
-        # print(ActuatorPower)
+        us_sensor = read_ultrasonic_metingen()
+        # print(us_sensor)
+        ldr_sensor = read_ldr_metingen()
+        # print(ldr_sensor)
+        ow_sensor = read_onewire_metingen()
+        # print(ow_sensor)
+        pir_sensor = read_pir()
+        print(pir_sensor)
+        lcd_display()
+
+        actuatorPower = vent.set_active(pir_sensor,ow_sensor)
+
         date = datetime.now()
         json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
-        afstand = ultra.meting()
-        DataRepository.create_meting(9,date,afstand,ActuatorPower,'Geen commentaar',25)
-        time.sleep(60)
+        create_ldr_metingen(date,ldr_sensor, actuatorPower)
+        create_oneWire_metingen(date,ow_sensor, actuatorPower)
+        create_ultraSonic_metingen(date,us_sensor, actuatorPower)
 
-#------------------------------LCD----------------------------------
-
-def lcd_display():
-    # print('test')
-    while True:
-        lcd.ipAdres()
-        time.sleep(60)
-
-
-#----------------------------PIR-----------------------------------
+        time.sleep(10)
 
 
 #---------------------------Threads---------------------------------
 
-#LDR
-threading.Timer(60, create_ldr_metingen).start()
-
-#TEMPERATUUR
-threading.Timer(60, create_oneWire_metingen).start()
-
-#ULTRA SONIC
-threading.Timer(1, create_ultraSonic_metingen).start()
-
-#LCD
-threading.Timer(60, lcd_display).start()
-
-#Ventilator
-# threading.Timer(1,thread_ventilator).start()
+#Total
+threading.Timer(10,total).start()
 
 
 #------------------------------------------------------------if__name__='__main__'------------------------------------------------------------------------
