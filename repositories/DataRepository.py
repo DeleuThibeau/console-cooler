@@ -42,9 +42,14 @@ class DataRepository:
         sql="SELECT * FROM Metingen"
         return Database.get_rows(sql)
 
-
     @staticmethod
     def read_metingen_device(DeviceID):
+        sql="SELECT * FROM Metingen WHERE  DeviceID = %s ORDER BY MetingID DESC Limit 30"
+        parameters=[DeviceID]
+        return Database.get_rows(sql, parameters)   
+
+    @staticmethod
+    def read_meting_device(DeviceID):
         sql="SELECT * FROM Metingen WHERE  DeviceID = %s ORDER BY MetingID DESC Limit 1"
         parameters=[DeviceID]
         return Database.get_one_row(sql, parameters)   

@@ -15,7 +15,8 @@ class Pir():
     def registratie(self):
         waarde =GPIO.input(self.pin)
         if waarde==1 and self.triggered == False: 
-            if self.counter == 1:
+            self.counter+=1
+            if self.counter == 2:
                 self.counter = 0
             else:
                 self.counter = 1 

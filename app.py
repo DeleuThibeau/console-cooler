@@ -73,6 +73,12 @@ def get_metingen_device(DeviceID):
     if request.method == 'GET':
         s = DataRepository.read_metingen_device(DeviceID)
         return jsonify(Metingen_Device=s), 200
+        
+@app.route(endpoint + '/meting/<DeviceID>', methods=['GET'])
+def get_meting_device(DeviceID):
+    if request.method == 'GET':
+        s = DataRepository.read_meting_device(DeviceID)
+        return jsonify(Meting_Device=s), 200
 
 @app.route(endpoint + '/devices', methods=['GET'])
 def get_all_devices():
@@ -131,10 +137,12 @@ def read_pir():
 def lcd_display():
     lcd.ipAdres()
 
+counter = 0
 
 
 def total():
     while True:
+        global counter
         us_sensor = read_ultrasonic_metingen()
         # print(us_sensor)
         ldr_sensor = read_ldr_metingen()
@@ -143,24 +151,30 @@ def total():
         # print(ow_sensor)
         pir_sensor = read_pir()
         print(pir_sensor)
-        lcd_display()
 
         actuatorPower = vent.set_active(pir_sensor,ow_sensor)
 
-        date = datetime.now()
-        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
+        counter +=1
+        print(counter)
 
-        create_ldr_metingen(date,ldr_sensor, actuatorPower)
-        create_oneWire_metingen(date,ow_sensor, actuatorPower)
-        create_ultraSonic_metingen(date,us_sensor, actuatorPower)
+        if counter == 20:
+            lcd_display()
+            date = datetime.now()
+            json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
-        time.sleep(10)
+            create_ldr_metingen(date,ldr_sensor, actuatorPower)
+            create_oneWire_metingen(date,ow_sensor, actuatorPower)
+            create_ultraSonic_metingen(date,us_sensor, actuatorPower)
+
+            counter =0
+
+        time.sleep(1)
 
 
 #---------------------------Threads---------------------------------
 
 #Total
-threading.Timer(10,total).start()
+threading.Timer(3,total).start()
 
 
 #------------------------------------------------------------if__name__='__main__'------------------------------------------------------------------------
