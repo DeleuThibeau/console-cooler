@@ -109,7 +109,7 @@ class LCD:
         vraag = str(ip_adres)
         vraag = vraag[13:27]
         vraag = 'Console Cooler ' + vraag
-        print(vraag)
+        # print(vraag)
         self.send_instruction(0b00000001)  # clear display/cursor home
         self.tekst(vraag)
 

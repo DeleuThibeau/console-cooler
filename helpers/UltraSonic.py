@@ -37,7 +37,7 @@ class UltraSonic:
 
         #Distance sensor geeft waarde van rond de 1000 als er geen verandering is in afstand => Delen zodat hij 0 geeft (=> Geen verandering)
 
-        if self.distance > 1000:
+        if self.distance > 80:
             self.distance = self.distance /101900000
         
         # print(f'Distance: {self.distance:.2f} cm')

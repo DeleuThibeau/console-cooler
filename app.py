@@ -93,8 +93,7 @@ def get_device(DeviceID):
         return jsonify(Device=s), 200
 
 
-#-------------------------------------------------------CREATIE METINGEN / LCD DISPLAY----------------------------------------------------------------------
-
+#--------------------------------------------------CREATIE METINGEN / LCD DISPLAY / WEGSCHRIJVEN NAAR DATABASE-------------------------------------------------------
 
 #--------------------------------LDR--------------------------------
 def read_ldr_metingen():
@@ -106,9 +105,7 @@ def read_ldr_metingen():
 def create_ldr_metingen(date, ldr, ActuatorPower, ID=6, commentaar='Geen commentaar', ingestelde_temp=20):
     DataRepository.create_meting(ID,date,ldr,ActuatorPower,commentaar,ingestelde_temp)
 
-
 #------------------------------One Wire-----------------------------
-
 def read_onewire_metingen():
     temp = OneWire.read_one_wire()
     return temp
@@ -116,9 +113,7 @@ def read_onewire_metingen():
 def create_oneWire_metingen(date,temp, ActuatorPower, ID=7, commentaar='Geen commentaar', ingestelde_temp=20):
     DataRepository.create_meting(ID,date,temp,ActuatorPower,commentaar,ingestelde_temp)
     
-
 #----------------------------Ultra Sonic----------------------------
-
 def read_ultrasonic_metingen():
     afstand = ultra.meting()
     return afstand
@@ -127,19 +122,18 @@ def create_ultraSonic_metingen(date,ultrasonic, ActuatorPower, ID=9, commentaar=
     DataRepository.create_meting(ID,date,ultrasonic, ActuatorPower, commentaar, ingestelde_temp)
 
 #--------------------------------PIR--------------------------------
-
 def read_pir():
     toestand = pir.registratie()
     return toestand
 
-#-------------------------------LCD---------------------------------
+# Counter nodig om PIR te laten werken als knop.
+counter = 0
 
+#--------------------------------LCD--------------------------------
 def lcd_display():
     lcd.ipAdres()
 
-counter = 0
-
-
+#----------------------------------------------------Cumulatie (total) van bovenstaande metingen-------------------------------------------------------------
 def total():
     while True:
         global counter
@@ -150,12 +144,17 @@ def total():
         ow_sensor = read_onewire_metingen()
         # print(ow_sensor)
         pir_sensor = read_pir()
-        print(pir_sensor)
+        # print(pir_sensor)
 
+        #VentilatorToestand
         actuatorPower = vent.set_active(pir_sensor,ow_sensor)
 
+        date = datetime.now()
+        json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
+        create_ultraSonic_metingen(date,us_sensor, actuatorPower)
+
         counter +=1
-        print(counter)
+        # print(counter)
 
         if counter == 20:
             lcd_display()
@@ -167,11 +166,12 @@ def total():
             create_ultraSonic_metingen(date,us_sensor, actuatorPower)
 
             counter =0
+        print(counter)
 
         time.sleep(1)
 
 
-#---------------------------Threads---------------------------------
+#------------------------------------------------------------------Threads--------------------------------------------------------------------------------
 
 #Total
 threading.Timer(3,total).start()
@@ -181,3 +181,5 @@ threading.Timer(3,total).start()
 
 if __name__ == '__main__':
     socketio.run(app, debug=False, host='0.0.0.0')  
+
+# The end

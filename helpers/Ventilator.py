@@ -19,7 +19,7 @@ class Ventilator():
         self.set_temp = set_temp
         self.toestand = toestand
         if self.toestand == 1:
-            if self.temperatuur >= self.set_temp + 2.5 or self.temperatuur <= self.set_temp + 4:
+            if self.temperatuur >= self.set_temp + 0.5 or self.temperatuur <= self.set_temp + 4:
                 self.pwm_motor.start(100)
                 self.pwm_motor.ChangeDutyCycle(50)
                 self.ActuatorPower = 'LOW'

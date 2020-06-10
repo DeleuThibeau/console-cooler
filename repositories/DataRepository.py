@@ -62,7 +62,7 @@ class DataRepository:
 
     @staticmethod
     def update_meting(DeviceID, Datum, SensorWaarde, ActuatorPower, Commentaar, Ingestelde_temp, MetingID):
-        sql=("UPDATE Metingen set DeviceID = %s, Datum = %s, SensorWaarde = %s, ActuatorPower = %s, Commentaar = %s, Ingestelde_temp=%s  WHERE  MetingID = %s")
+        sql=("UPDATE Metingen SET DeviceID = %s, Datum = %s, SensorWaarde = %s, ActuatorPower = %s, Commentaar = %s, Ingestelde_temp=%s  WHERE  MetingID = %s")
         parameters= [DeviceID, Datum, SensorWaarde, ActuatorPower,Commentaar, Ingestelde_temp, MetingID]
         return Database.execute_sql(sql, parameters)
 
@@ -72,4 +72,17 @@ class DataRepository:
     #     parameters = [DeviceID1, Datum1, SensorWaarde1, ActuatorPower1, Commentaar1,DeviceID2, Datum2, SensorWaarde2, ActuatorPower2, Commentaar2]
     #     return Database.execute_sql(sql, parameters)
 
+    @staticmethod
+    def filter_meting(deviceID, startdatum, einddatum):
+        sql = "GET Metingen WHERE Datum BETWEEN startdatum=%s and einddatum=%s"
+        params = [deviceID,  startdatum, einddatum]
+        print(sql)
+        return Database.execute_sql(sql, params)
+
+    @staticmethod
+    def update_meting_comment(comment, metingID):
+        sql = "UPDATE Metingen SET Comment = %s WHERE metiingID = %s"
+        params = [comment, metingID]
+        print(sql)
+        return Database.execute_sql(sql, params)
 
