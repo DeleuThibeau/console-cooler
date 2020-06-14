@@ -81,8 +81,15 @@ class DataRepository:
 
     @staticmethod
     def update_meting_comment(comment, metingID):
-        sql = "UPDATE Metingen SET Comment = %s WHERE metiingID = %s"
+        sql = "UPDATE Metingen SET Comment = %s WHERE metingID = %s"
         params = [comment, metingID]
         print(sql)
         return Database.execute_sql(sql, params)
+
+    # @staticmethod
+    # def update_goal_temp(comment, date):
+    #     sql = "UPDATE Metingen SET Ingestelde_temp = %s where Datum='%s'"
+    #     params = [comment, date]
+    #     print(sql)
+    #     return Database.execute_sql(sql, params)
 

@@ -93,6 +93,54 @@ def get_device(DeviceID):
         return jsonify(Device=s), 200
 
 
+
+
+
+
+@app.route(endpoint + '/treinen/<trein_id>/vertraging', methods=['PUT'])
+def update_comment(metingID):
+    if request.method == 'PUT':
+        gegevens = DataRepository.json_or_formdata(request)
+        return jsonify(trein_id=trein_id), 200
+
+
+
+
+#Globale variabele
+toggle_switch_front_end = 1
+goal_temp = 20
+
+
+@socketio.on('F2B_switch_toggle')
+def switch_toggle(data):
+    global toggle_switch_front_end
+    print('ventilator gaat aan/uit')
+    new_status = data['toggle_status']
+    
+    toggle_switch_front_end = new_status
+
+    print('De nieuwe status is', new_status)
+
+
+
+@socketio.on('F2B_update_goal_temp')
+def set_goal_temp(data):
+    global goal_temp
+    print('goal temp wordt ingesteld')
+    new_goal_temp = data['goal_temp']
+    
+    goal_temp = new_goal_temp
+    print('De nieuwe goal temp is', new_goal_temp)
+    time.sleep(1)
+
+
+
+
+
+
+
+
+
 #--------------------------------------------------CREATIE METINGEN / LCD DISPLAY / WEGSCHRIJVEN NAAR DATABASE-------------------------------------------------------
 
 #--------------------------------LDR--------------------------------
@@ -133,10 +181,16 @@ counter = 0
 def lcd_display():
     lcd.ipAdres()
 
+
+switch_front_end = 0
 #----------------------------------------------------Cumulatie (total) van bovenstaande metingen-------------------------------------------------------------
 def total():
     while True:
         global counter
+        global toggle_switch_front_end
+        global goal_temp
+        goal_temp = int(goal_temp)
+
         us_sensor = read_ultrasonic_metingen()
         # print(us_sensor)
         ldr_sensor = read_ldr_metingen()
@@ -147,7 +201,7 @@ def total():
         # print(pir_sensor)
 
         #VentilatorToestand
-        actuatorPower = vent.set_active(pir_sensor,ow_sensor)
+        actuatorPower = vent.set_active(toggle_switch_front_end, pir_sensor,ow_sensor, goal_temp)
 
         date = datetime.now()
         json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
@@ -156,17 +210,17 @@ def total():
         counter +=1
         # print(counter)
 
-        if counter == 20:
+        if counter == 15:
             lcd_display()
             date = datetime.now()
             json_date = json.dumps(date, indent=4, sort_keys=True, default=str)
 
-            create_ldr_metingen(date,ldr_sensor, actuatorPower)
-            create_oneWire_metingen(date,ow_sensor, actuatorPower)
-            create_ultraSonic_metingen(date,us_sensor, actuatorPower)
+            create_ldr_metingen(date,ldr_sensor, actuatorPower,6,'Geen commentaar',goal_temp)
+            create_oneWire_metingen(date,ow_sensor, actuatorPower,7,'Geen commentaar',goal_temp)
+            create_ultraSonic_metingen(date,us_sensor, actuatorPower,9,'Geen commentaar',goal_temp)
 
             counter =0
-        print(counter)
+        # print(counter)
 
         time.sleep(1)
 

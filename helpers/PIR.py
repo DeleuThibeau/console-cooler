@@ -26,7 +26,9 @@ class Pir():
             self.triggered == True                      
             
         elif waarde==0:  
-            self.triggered = False          
+            self.triggered = False     
+        print(self.buffer)
+        print(self.counter)     
 
         return self.counter
             
