@@ -56,7 +56,7 @@ CORS(app)
 endpoint = '/api/v1'
 
 
-# API ENDPOINTS
+#------------------------------------ROUTES--------------------------------------
 @app.route('/')
 def hallo():
     return "Server is running, er zijn momenteel geen API endpoints beschikbaar."
@@ -94,17 +94,7 @@ def get_device(DeviceID):
 
 
 
-
-
-
-@app.route(endpoint + '/treinen/<trein_id>/vertraging', methods=['PUT'])
-def update_comment(metingID):
-    if request.method == 'PUT':
-        gegevens = DataRepository.json_or_formdata(request)
-        return jsonify(trein_id=trein_id), 200
-
-
-
+#--------------------------------------SOCKETS-------------------------------------
 
 #Globale variabele
 toggle_switch_front_end = 1
@@ -122,7 +112,6 @@ def switch_toggle(data):
     print('De nieuwe status is', new_status)
 
 
-
 @socketio.on('F2B_update_goal_temp')
 def set_goal_temp(data):
     global goal_temp
@@ -132,11 +121,6 @@ def set_goal_temp(data):
     goal_temp = new_goal_temp
     print('De nieuwe goal temp is', new_goal_temp)
     time.sleep(1)
-
-
-
-
-
 
 
 

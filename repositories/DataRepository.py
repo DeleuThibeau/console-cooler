@@ -66,30 +66,26 @@ class DataRepository:
         parameters= [DeviceID, Datum, SensorWaarde, ActuatorPower,Commentaar, Ingestelde_temp, MetingID]
         return Database.execute_sql(sql, parameters)
 
-    # @staticmethod
-    # def create_metingen(DeviceID1, Datum1, SensorWaarde1, ActuatorPower1, Commentaar1,DeviceID2, Datum2, SensorWaarde2, ActuatorPower2, Commentaar2):
-    #     sql='INSERT INTO Metingen (DeviceID, Datum, SensorWaarde, ActuatorPower, Commentaar) VALUES ((%s,%s,%s,%s,%s),(%s,%s,%s,%s,%s))'
-    #     parameters = [DeviceID1, Datum1, SensorWaarde1, ActuatorPower1, Commentaar1,DeviceID2, Datum2, SensorWaarde2, ActuatorPower2, Commentaar2]
-    #     return Database.execute_sql(sql, parameters)
 
-    @staticmethod
-    def filter_meting(deviceID, startdatum, einddatum):
-        sql = "GET Metingen WHERE Datum BETWEEN startdatum=%s and einddatum=%s"
-        params = [deviceID,  startdatum, einddatum]
-        print(sql)
-        return Database.execute_sql(sql, params)
 
-    @staticmethod
-    def update_meting_comment(comment, metingID):
-        sql = "UPDATE Metingen SET Comment = %s WHERE metingID = %s"
-        params = [comment, metingID]
-        print(sql)
-        return Database.execute_sql(sql, params)
+
+
+
+#---------------------------------------------------------------------In Development---------------------------------------------------------------------
 
     # @staticmethod
-    # def update_goal_temp(comment, date):
-    #     sql = "UPDATE Metingen SET Ingestelde_temp = %s where Datum='%s'"
-    #     params = [comment, date]
+    # def filter_meting(deviceID, startdatum, einddatum):
+    #     sql = "SELECT * FROM Metingen where DeviceID=%s and Datum between '%s' and '%s'"
+    #     params = [deviceID,  startdatum, einddatum]
     #     print(sql)
     #     return Database.execute_sql(sql, params)
+
+
+    # @staticmethod
+    # def update_meting_comment(comment, metingID):
+    #     sql = "UPDATE Metingen SET Comment = %s WHERE metingID = %s"
+    #     params = [comment, metingID]
+    #     print(sql)
+    #     return Database.execute_sql(sql, params)
+
 
